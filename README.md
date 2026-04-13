@@ -1,3 +1,3 @@
 # Asterisk-Docker
 
-test pull
+test
