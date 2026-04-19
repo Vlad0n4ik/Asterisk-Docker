@@ -1,3 +1,0 @@
-# Asterisk-Docker
-
-test

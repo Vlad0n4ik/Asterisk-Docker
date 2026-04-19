@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:latest
+    container_name: asterisk-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: asterisk_db
+      MYSQL_USER: asterisk_user
+      MYSQL_PASSWORD: root
+    # Эта папка на хосте позволит тебе один раз закинуть туда .sql файл, 
+    # и база сама создаст все нужные таблицы для Asterisk
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db_init:/docker-entrypoint-initdb.d 
+
+  asterisk:
+    build: 
+      context: ./asterisk
+      dockerfile: Dockerfile
+    container_name: asterisk-server
+    restart: always
+    depends_on:
+      - db
+    network_mode: "host"
+    volumes:
+      - ./asterisk/config/odbc.ini:/etc/odbc.ini
+      - ./asterisk/config/odbcinst.ini:/etc/odbcinst.ini
+      - ./asterisk/config/res_odbc.conf:/etc/asterisk/res_odbc.conf
+      - ./asterisk/config/extconfig.conf:/etc/asterisk/extconfig.conf
+      - ./asterisk/config/pjsip.conf:/etc/asterisk/pjsip.conf
+      - ./asterisk/config/modules.conf:/etc/asterisk/modules.conf
+
+volumes:
+  db_data:
